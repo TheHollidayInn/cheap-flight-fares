@@ -40,7 +40,7 @@
             .form-check-input(type='checkbox', :value='travelTimeOption.key+index')
             | {{travelTimeOption.label}}
     button.btn.btn-secondary(type='submit', @click='activePane = "to-pane"') Prev
-    button.btn.btn-primary(type='submit', @click='activePane = "done-pane"; done()', :disabled='travelTimes.length === 0') Done
+    button.btn.btn-primary(type='submit', @click='done()', :disabled='travelTimes.length === 0') Done
   #done-pane.col-12.col-md-6.offset-md-3(v-show='activePane === "done-pane"', key='done-pane')
     h2 All done! You will receive notifications soon.
     p You can always reset your settings by visiting this page.
@@ -54,6 +54,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: 'HelloWorld',
   data () {
@@ -136,11 +138,23 @@ export default {
       }
       this.travelTimes.splice(currentIndex, 1)
     },
-    done () {
+    async done () {
       localStorage.setItem('flighttravel-email', this.email)
       localStorage.setItem('flighttravel-departureAirports', JSON.stringify(this.departureAirports))
       localStorage.setItem('flighttravel-destinationCities', JSON.stringify(this.destinationCities))
       localStorage.setItem('flighttravel-travelTimes', JSON.stringify(this.travelTimes))
+
+      try {
+        const result = await axios.post('https://flightfares.herokuapp.com/api/subscribe', {
+          email: this.email,
+          departureAirports: this.departureAirports,
+          destinationCities: this.destinationCities,
+          travelTimes: this.travelTimes,
+        })
+        this.activePane = 'done-pane';
+      } catch (e) {
+        alert(e.response.data.err)
+      }
     }
   }
 }
