@@ -11,16 +11,21 @@
         button.btn.btn-primary(type='submit', @click='activePane = "leave-pane"', :disabled='!email') Next
   #leave-pane.pane.col-12.col-md-6.offset-md-3(v-show='activePane === "leave-pane"', key='leave-pane')
     h2 Where do you want to leave from? (Select Multiple for the Best Results)
-    .row.content
-      .col-3.form-check-wrapper(v-for='(departureOption, index) in departureAirportOptions')
-        .form-check(:class="{active: departureAirports.indexOf(departureOption.key+index) !== -1}", @click='toggleDepartureSelection(departureOption.key+index)')
-          label.form-check-label
-            .form-check-input(type='checkbox', :value='departureOption.key+index')
-            | {{departureOption.label}}
+    .col-12.col-md-6.offset-md-3
+      .form-group
+        input.form-control(type='text', placeholder='Search Airports', v-model='airportSearch')
     .row
       .col-12.col-md-6.offset-md-3
         button.btn.btn-secondary(type='submit', @click='activePane = "email-pane"') Prev
         button.btn.btn-primary(type='submit', @click='activePane = "to-pane"', :disabled='departureAirports.length === 0') Next
+    .content
+      .row(v-for='(airports, key) in departureAirportOptions')
+        h5.col-12 {{key}}
+        .col-3.form-check-wrapper(v-for='(departureOption, index) in airports')
+          .form-check(:class="{active: departureAirports.indexOf(departureOption.faa) !== -1}", @click='toggleDepartureSelection(departureOption.faa)')
+            label.form-check-label
+              .form-check-input(type='checkbox', :value='departureOption.faa')
+              | {{departureOption.airport}}
   #to-pane.col-12.col-md-6.offset-md-3(v-show='activePane === "to-pane"', key='to-pane')
     h2 Where would you live to travel to?
     .row.content
@@ -54,7 +59,9 @@
 </template>
 
 <script>
+import groupBy from 'lodash/groupBy'
 import axios from 'axios'
+import airports from '../content/airports'
 
 export default {
   name: 'HelloWorld',
@@ -66,32 +73,6 @@ export default {
       departureAirports: [],
       destinationCities: [],
       travelTimes: [],
-      departureAirportOptions: [
-        {
-          key: 'dfw',
-          label: 'Dallas (DFW)'
-        },
-        {
-          key: 'dfw',
-          label: 'Dallas (DFW)'
-        },
-        {
-          key: 'dfw',
-          label: 'Dallas (DFW)'
-        },
-        {
-          key: 'dfw',
-          label: 'Dallas (DFW)'
-        },
-        {
-          key: 'dfw',
-          label: 'Dallas (DFW)'
-        },
-        {
-          key: 'dfw',
-          label: 'Dallas (DFW)'
-        }
-      ],
       destinationCitiesOptions: [
         {
           key: 'paris',
@@ -103,7 +84,8 @@ export default {
           key: '1_3_days',
           label: '1-3 Days'
         }
-      ]
+      ],
+      airportSearch: ''
     }
   },
   mounted () {
@@ -111,6 +93,21 @@ export default {
     this.departureAirports = JSON.parse(localStorage.getItem('flighttravel-departureAirports')) || []
     this.destinationCities = JSON.parse(localStorage.getItem('flighttravel-destinationCities')) || []
     this.travelTimes = JSON.parse(localStorage.getItem('flighttravel-travelTimes')) || []
+  },
+  computed: {
+    departureAirportOptions () {
+      const airportsGrouped = groupBy(airports, 'state')
+
+      if (!this.airportSearch) return airportsGrouped
+
+      const filteredAirports = airports.filter(airport => {
+        const airportName = airport.airport.toLowerCase()
+        const search = this.airportSearch.toLowerCase()
+        return airportName.indexOf(search) !== -1
+      })
+
+      return groupBy(filteredAirports, 'state')
+    }
   },
   methods: {
     toggleDepartureSelection (key) {
@@ -145,13 +142,13 @@ export default {
       localStorage.setItem('flighttravel-travelTimes', JSON.stringify(this.travelTimes))
 
       try {
-        const result = await axios.post('https://flightfares.herokuapp.com/api/subscribe', {
+        await axios.post('https://flightfares.herokuapp.com/api/subscribe', {
           email: this.email,
           departureAirports: this.departureAirports,
           destinationCities: this.destinationCities,
-          travelTimes: this.travelTimes,
+          travelTimes: this.travelTimes
         })
-        this.activePane = 'done-pane';
+        this.activePane = 'done-pane'
       } catch (e) {
         alert(e.response.data.err)
       }
