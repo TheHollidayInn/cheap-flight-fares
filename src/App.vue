@@ -9,7 +9,7 @@
         .col-3
           a(href='#/login', v-if='!isLoggedIn') Login
           a(href='#/register', v-if='!isLoggedIn') Register
-          a.btn.btn-primary(href='#/account', v-if='hasSub') Account
+          a.btn.btn-primary(href='#/account', v-if='isLoggedIn && hasSub') Account
           a.btn.btn-primary(href='#/subscribe', v-if='!hasSub') Subscribe
           a(href='/', v-if='isLoggedIn', @click.prevent='logout()') Logout
     router-view
