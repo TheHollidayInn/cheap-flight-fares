@@ -118,14 +118,26 @@ export default {
           label: '5-8 Days'
         }
       ],
-      airportSearch: ''
+      airportSearch: '',
+      user: '',
+      hasSub: false
     }
   },
-  mounted () {
+  async mounted () {
     this.email = localStorage.getItem('flighttravel-email') || ''
     this.departureAirports = JSON.parse(localStorage.getItem('flighttravel-departureAirports')) || []
     this.destinationCities = JSON.parse(localStorage.getItem('flighttravel-destinationCities')) || []
     this.travelTimes = JSON.parse(localStorage.getItem('flighttravel-travelTimes')) || []
+
+    try {
+      const token = localStorage.getItem('token')
+      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
+      const response = await axios.get('https://flightfares.herokuapp.com/api/me')
+      this.user = response.data.user
+      this.hasSub = Boolean(this.user.stripeSubscriptionId)
+    } catch (e) {
+
+    }
   },
   computed: {
     departureAirportOptions () {
@@ -142,14 +154,14 @@ export default {
       return groupBy(filteredAirports, 'state')
     },
     isFreeAccount () {
-      return true
+      return !this.hasSub
     }
   },
   methods: {
     toggleDepartureSelection (key) {
       const currentIndex = this.departureAirports.indexOf(key)
 
-      if (this.departureAirports.length === 1 && currentIndex === -1) {
+      if (this.isFreeAccount && this.departureAirports.length === 1 && currentIndex === -1) {
         alert('Free accounts can only select one departure airport. Upgrade to select more :D')
         return
       }
@@ -164,7 +176,7 @@ export default {
     toggleDestinationSelection (key) {
       const currentIndex = this.destinationCities.indexOf(key)
 
-      if (this.destinationCities.length === 1 && currentIndex === -1) {
+      if (this.isFreeAccount && this.destinationCities.length === 1 && currentIndex === -1) {
         alert('Free accounts can only select one destination. Upgrade to select more :D')
         return
       }

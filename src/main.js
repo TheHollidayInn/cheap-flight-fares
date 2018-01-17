@@ -3,6 +3,9 @@
 import Vue from 'vue'
 import App from './App'
 import router from './router'
+import { StripeCheckout } from 'vue-stripe'
+
+Vue.component('stripe-checkout', StripeCheckout)
 
 Vue.config.productionTip = false
 

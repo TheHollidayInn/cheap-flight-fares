@@ -9,7 +9,8 @@
         .col-3
           a(href='#/login', v-if='!isLoggedIn') Login
           a(href='#/register', v-if='!isLoggedIn') Register
-          a.btn.btn-primary(href='#/subscribe', v-if='!this.user.stripeSubscriptionId') Subscribe
+          a.btn.btn-primary(href='#/account', v-if='hasSub') Account
+          a.btn.btn-primary(href='#/subscribe', v-if='!hasSub') Subscribe
           a(href='/', v-if='isLoggedIn', @click.prevent='logout()') Logout
     router-view
 </template>
@@ -21,7 +22,8 @@ export default {
   name: 'App',
   data () {
     return {
-      user: ''
+      user: '',
+      hasSub: false
     }
   },
   async mounted () {
@@ -30,6 +32,7 @@ export default {
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       const response = await axios.get('https://flightfares.herokuapp.com/api/me')
       this.user = response.data.user
+      this.hasSub = Boolean(this.user.stripeSubscriptionId)
     } catch (e) {
 
     }
