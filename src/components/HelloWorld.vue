@@ -1,5 +1,5 @@
 <template lang="pug">
-#container
+#container.text-center
   #email-pane.pane.col-12.col-md-6.offset-md-3(v-show='activePane === "email-pane"', key='email-pane')
     h2 What email would you like us to send notifications to?
     .row.content
@@ -28,11 +28,12 @@
               | {{departureOption.airport}}
   #to-pane.col-12.col-md-6.offset-md-3(v-show='activePane === "to-pane"', key='to-pane')
     h2 Where would you live to travel to?
+    strong (More Destinations Coming Soon! Contact us if we don't have the place you want)
     .row.content
       .col-3.form-check-wrapper(v-for='(destinationOption, index) in destinationCitiesOptions')
-        .form-check(:class="{active: destinationCities.indexOf(destinationOption.key+index) !== -1}", @click='toggleDestinationSelection(destinationOption.key+index)')
+        .form-check(:class="{active: destinationCities.indexOf(destinationOption.key) !== -1}", @click='toggleDestinationSelection(destinationOption.key)')
           label.form-check-label
-            .form-check-input(type='checkbox', :value='destinationOption.key+index')
+            .form-check-input(type='checkbox', :value='destinationOption.key')
             | {{destinationOption.label}}
     button.btn.btn-secondary(type='submit', @click='activePane = "leave-pane"') Prev
     button.btn.btn-primary(type='submit', @click='activePane = "day-pane"', :disabled='destinationCities.length === 0') Next
@@ -40,9 +41,9 @@
     h2 Select the date ranges you would like to travel for
     .row.content
       .col-3.form-check-wrapper(v-for='(travelTimeOption, index) in travelTimeOptions')
-        .form-check(:class="{active: travelTimes.indexOf(travelTimeOption.key+index) !== -1}", @click='toggleTravelTimeSelection(travelTimeOption.key+index)')
+        .form-check(:class="{active: travelTimes.indexOf(travelTimeOption.key) !== -1}", @click='toggleTravelTimeSelection(travelTimeOption.key)')
           label.form-check-label
-            .form-check-input(type='checkbox', :value='travelTimeOption.key+index')
+            .form-check-input(type='checkbox', :value='travelTimeOption.key')
             | {{travelTimeOption.label}}
     button.btn.btn-secondary(type='submit', @click='activePane = "to-pane"') Prev
     button.btn.btn-primary(type='submit', @click='done()', :disabled='travelTimes.length === 0') Done
@@ -55,7 +56,7 @@
     br
     br
     h4 Would you like to subscribe to add more destinations to your notifications?
-    button.btn.btn-primary Subscribe
+    a.btn.btn-primary(href='#/subscribe') Subscribe
 </template>
 
 <script>
@@ -77,12 +78,44 @@ export default {
         {
           key: 'paris',
           label: 'Paris'
+        },
+        {
+          key: 'london',
+          label: 'London'
+        },
+        {
+          key: 'barcelona',
+          label: 'Barcelona'
+        },
+        {
+          key: 'rome',
+          label: 'Rome'
+        },
+        {
+          key: 'istanbul',
+          label: 'Istanbul'
+        },
+        {
+          key: 'venice',
+          label: 'Venice'
+        },
+        {
+          key: 'amsterdam',
+          label: 'Amsterdam'
         }
       ],
       travelTimeOptions: [
         {
           key: '1_3_days',
           label: '1-3 Days'
+        },
+        {
+          key: '3_5_days',
+          label: '3-5 Days'
+        },
+        {
+          key: '5_8_days',
+          label: '5-8 Days'
         }
       ],
       airportSearch: ''
@@ -107,20 +140,35 @@ export default {
       })
 
       return groupBy(filteredAirports, 'state')
+    },
+    isFreeAccount () {
+      return true
     }
   },
   methods: {
     toggleDepartureSelection (key) {
-      console.log(this.departureAirports)
       const currentIndex = this.departureAirports.indexOf(key)
+
+      if (this.departureAirports.length === 1 && currentIndex === -1) {
+        alert('Free accounts can only select one departure airport. Upgrade to select more :D')
+        return
+      }
+
       if (currentIndex === -1) {
         this.departureAirports.push(key)
         return
       }
+
       this.departureAirports.splice(currentIndex, 1)
     },
     toggleDestinationSelection (key) {
       const currentIndex = this.destinationCities.indexOf(key)
+
+      if (this.destinationCities.length === 1 && currentIndex === -1) {
+        alert('Free accounts can only select one destination. Upgrade to select more :D')
+        return
+      }
+
       if (currentIndex === -1) {
         this.destinationCities.push(key)
         return

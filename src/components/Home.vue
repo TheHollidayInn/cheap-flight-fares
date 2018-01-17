@@ -1,7 +1,7 @@
 <template lang="pug">
 .row.main-banner
   .overlay
-  .col-12
+  .col-12.col-md-6.offset-md-3.text-center
     h1 Welcome
     h5 Get alerts for cheap flights across the world
     a.btn.btn-primary(href='#/signup') Signup
