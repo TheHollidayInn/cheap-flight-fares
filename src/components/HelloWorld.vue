@@ -55,8 +55,9 @@
     br
     br
     br
-    h4 Would you like to subscribe to add more destinations to your notifications?
-    a.btn.btn-primary(href='#/subscribe') Subscribe
+    div(v-if='!hasSub')
+      h4 Would you like to subscribe to add more destinations to your notifications?
+      a.btn.btn-primary(href='#/subscribe') Subscribe
 </template>
 
 <script>
@@ -140,6 +141,12 @@ export default {
     }
   },
   computed: {
+    user () {
+      return this.$store.user
+    },
+    hasSub () {
+      return this.user && Boolean(this.user.stripeSubscriptionId)
+    },
     departureAirportOptions () {
       const airportsGrouped = groupBy(airports, 'state')
 

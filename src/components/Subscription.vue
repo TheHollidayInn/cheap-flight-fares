@@ -15,7 +15,7 @@ import axios from 'axios'
 import { Bus } from 'vue-stripe'
 
 export default {
-  name: 'Login',
+  name: 'Subscription',
   data () {
     return {
       load: true,
@@ -30,11 +30,12 @@ export default {
     Bus.$on('vue-stripe.success', async payload => {
       this.loading = true
       try {
-        const response = await axios.post('http://flightfares.herokuapp.com/api/purchase-subscription', {
+        const response = await axios.post('https://flightfares.herokuapp.com/api/purchase-subscription', {
           email: payload.email,
           id: payload.token
         })
-        window.location.href = '/#/signup'
+        this.$store.commit('setUserStripe', response.data.charge.id)
+        this.$router.push({name: 'HelloWorld'})
       } catch (e) {
         alert(e.response.data.error)
         this.loading = false

@@ -20,32 +20,33 @@ import axios from 'axios'
 
 export default {
   name: 'App',
-  data () {
-    return {
-      user: '',
-      hasSub: false
-    }
-  },
   async mounted () {
     try {
       const token = localStorage.getItem('token')
+      if (!token) return
       axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
       const response = await axios.get('https://flightfares.herokuapp.com/api/me')
-      this.user = response.data.user
-      this.hasSub = Boolean(this.user.stripeSubscriptionId)
+      this.$store.commit('setUser', response.data.user)
     } catch (e) {
 
     }
   },
   computed: {
+    user () {
+      return this.$store.state.user
+    },
     isLoggedIn () {
-      return Boolean(this.user)
+      return Boolean(this.user._id)
+    },
+    hasSub () {
+      return this.user && Boolean(this.user.stripeSubscriptionId)
     }
   },
   methods: {
     logout () {
-      this.user = ''
+      this.$store.commit('setUser', {})
       localStorage.setItem('token', '')
+      this.$router.push({name: 'Home'})
     }
   }
 }

@@ -7,13 +7,12 @@
 
 <script>
 import axios from 'axios'
-import { Bus } from 'vue-stripe'
 
 export default {
   name: 'Account',
   data () {
     return {
-      loading: true,
+      loading: true
     }
   },
   methods: {
@@ -21,8 +20,9 @@ export default {
       if (!confirm('Are you sure you want to unsubscribe?')) return
       this.loading = true
       try {
-        const response = await axios.post('http://flightfares.herokuapp.com/api/cancel-subscription')
-        window.location.href = '/'
+        await axios.post('https://flightfares.herokuapp.com/api/cancel-subscription')
+        this.$store.commit('setUserStripe', '')
+        this.$router.push({name: 'Home'})
       } catch (e) {
         alert(e.response.data.error)
         this.loading = false

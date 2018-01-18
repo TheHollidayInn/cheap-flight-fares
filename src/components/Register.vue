@@ -18,7 +18,7 @@
 import axios from 'axios'
 
 export default {
-  name: 'Login',
+  name: 'Register',
   data () {
     return {
       email: '',
@@ -41,8 +41,10 @@ export default {
           email: this.email,
           password: this.password
         })
-        localStorage.setItem('token', response.data.token)
-        window.location.href = '/'
+        await this.$store.dispatch('setToken', {
+          token: response.data.token
+        })
+        this.$router.push({name: 'Home'})
       } catch (e) {
         alert(e.response.data.err)
         this.loading = false
