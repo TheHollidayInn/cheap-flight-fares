@@ -2,6 +2,7 @@
   .content.col-12.col-md-6.offset-md-3
     form
       h2.text-center Login
+      h5.text-center(v-if='subscribing') Login, then we will set you up with a subscription :D
       .form-group
         label Email
         input.form-control(type='email', v-model='email')
@@ -23,6 +24,11 @@ export default {
       loading: false
     }
   },
+  computed: {
+    subscribing () {
+      return this.$route.query.subscribing
+    }
+  },
   methods: {
     async login () {
       this.loading = true
@@ -34,6 +40,12 @@ export default {
         await this.$store.dispatch('setToken', {
           token: response.data.token
         })
+
+        if (this.subscribing) {
+          this.$router.push({name: 'Subscription'})
+          return
+        }
+
         this.$router.push({name: 'Home'})
       } catch (e) {
         alert(e.response.data.err)

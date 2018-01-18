@@ -119,9 +119,7 @@ export default {
           label: '5-8 Days'
         }
       ],
-      airportSearch: '',
-      user: '',
-      hasSub: false
+      airportSearch: ''
     }
   },
   async mounted () {
@@ -129,16 +127,6 @@ export default {
     this.departureAirports = JSON.parse(localStorage.getItem('flighttravel-departureAirports')) || []
     this.destinationCities = JSON.parse(localStorage.getItem('flighttravel-destinationCities')) || []
     this.travelTimes = JSON.parse(localStorage.getItem('flighttravel-travelTimes')) || []
-
-    try {
-      const token = localStorage.getItem('token')
-      axios.defaults.headers.common['Authorization'] = `Bearer ${token}`
-      const response = await axios.get('https://flightfares.herokuapp.com/api/me')
-      this.user = response.data.user
-      this.hasSub = Boolean(this.user.stripeSubscriptionId)
-    } catch (e) {
-
-    }
   },
   computed: {
     user () {

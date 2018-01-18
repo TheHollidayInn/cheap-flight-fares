@@ -41,6 +41,12 @@ export default {
         this.loading = false
       }
     })
+
+    // Store takes too long from redirect
+    const token = localStorage.getItem('token')
+    if (!token) {
+      this.$router.push({name: 'Register', query: {subscribing: true}})
+    }
   },
   destroyed () {
     Bus.$off('vue-stripe.success')
