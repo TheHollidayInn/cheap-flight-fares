@@ -130,7 +130,7 @@ export default {
   },
   computed: {
     user () {
-      return this.$store.user
+      return this.$store.state.user
     },
     hasSub () {
       return this.user && Boolean(this.user.stripeSubscriptionId)
