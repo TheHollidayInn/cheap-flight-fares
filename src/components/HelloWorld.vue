@@ -161,6 +161,11 @@ export default {
         return
       }
 
+      if (!this.isFreeAccount && this.departureAirports.length === 5 && currentIndex === -1) {
+        alert('We recommend only selecting up to 5 departureAirports at a time to get the best results!')
+        return
+      }
+
       if (currentIndex === -1) {
         this.departureAirports.push(key)
         return
